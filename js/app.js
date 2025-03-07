@@ -9,6 +9,12 @@ const CHECK = "fa-check-circle";
 const UNCHECK = "fa-circle-thin";
 const LINE_THROUGH = "lineThrough";
 
+//Variables
+let LIST, id;
+
+//get item from local storage
+
+
 //Shows todays date
 const options = {weekday: "long", month:"short", day:"numeric"};
 const today = new Date();
@@ -16,7 +22,12 @@ dateElements.innerHTML = today.toLocaleDateString("en-US", options);
 
 //add to do function
 
-function addToDo(toDo) {
+function addToDo(toDo, id, done, trash) {
+
+    if(trash){ return; }
+
+    const DONE = done ? CHECK : UNCHECK;
+    const LINE = done ? LINE_THROUGH : "";
 
     const item = `<li class="item">
     <i class="fa fa-circle-thin co" job="complete" id="0"></i>
@@ -30,4 +41,58 @@ const position = "beforeend";
 list.insertAdjacentHTML(position, item);
 }
 
-addToDo("drink coffee");
+//add an item to the list using the enter key
+document.addEventListener("keyup", function(even){
+    if(event.keyCode == 13){
+        const toDo = input.value;
+
+        //if the input isn't empty
+        if(toDo){
+            addToDo(toDo);
+
+            LIST.push({
+                name : toDo,
+                id : id,
+                done : false,
+                trash: false
+            });
+
+            //add item to localstorage
+            localStorage.setItem("TODO", JSON.stringify(LIST));
+
+            id++;
+        }
+        input.value = "";
+    }
+});
+
+//complete to do
+function completeToDo(element){
+    element.classList.toggle(CHECK);
+    element.classList.toggle(UNCHECK);
+    element.parentNode.querySelector(".text").classList.toggle(LINE_THROUGH);
+
+    LIST[element.id].done = LIST[element.id].done ? false : true;
+}
+
+//remove to do
+function removeToDo(element){
+    element.parentNode.parentNode.removeChild(element.parentNode);
+
+    LIST[element.id].trash = true;
+}
+
+//target the items created dynamically 
+
+list.addEventListener("click", function(event){
+    const element = event.target;
+    const elementJob = element.attributes.job.value;
+
+    if(elementJob == "complete"){
+        completeToDo(element);
+    }else if(elementJob == "remove"){
+        removeToDo(element); 
+    }
+    //add item to localstorage
+    localStorage.setItem("TODO", JSON.stringify(LIST));
+});
