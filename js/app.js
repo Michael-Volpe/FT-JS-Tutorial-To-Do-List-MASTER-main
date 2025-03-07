@@ -13,7 +13,31 @@ const LINE_THROUGH = "lineThrough";
 let LIST, id;
 
 //get item from local storage
+let data = localStorage.getItem("TODO");
 
+//check if data is not empty
+if(data){
+    LIST = JSON.parse(data);
+    id = LIST.length;
+    loadList(LIST);
+}else{
+    //if data isn't empty
+    LIST = [];
+    id = 0;
+}
+
+//load items to the users interface
+function loadList(array){
+    array.forEach(function(item){
+        addToDo(item.name, item.id, item.done, item.trash);
+    });
+}
+
+//clear the local storage
+clear.addEventListener("click", function(){
+    localStorage.clear();
+    location.reload();
+});
 
 //Shows todays date
 const options = {weekday: "long", month:"short", day:"numeric"};
